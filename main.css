@@ -1,0 +1,45 @@
+body {
+    margin: 0;
+    line-height: normal;
+    font-family: proxima-nova;
+}
+
+h1 {
+    text-align: center;
+}
+
+thead, th {
+    width:  10%;
+}
+
+th, td {
+    padding: 8px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.header, .signature {
+    text-align: right;
+}
+
+.notice {
+    font-family: TimesNewRoman, 'Times New Roman', Times, serif;
+    border-style: solid;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-size: 15px;
+}
+
+ol {
+    text-align: justify;
+}
+
+ol li {
+    margin: 14px 0;
+}
+
+ol.lower-roman li {
+    list-style-type: lower-roman;
+    margin: 0;
+}
+
