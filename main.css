@@ -2,10 +2,13 @@ body {
     margin: 0;
     line-height: normal;
     font-family: proxima-nova;
+    font-size: 12px;
 }
 
 h1 {
+    margin-top: 5px;
     text-align: center;
+    font-size: 16px;
 }
 
 thead, th {
