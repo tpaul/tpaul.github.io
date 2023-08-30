@@ -426,7 +426,6 @@ textarea {
 body {
   font-size: 13px;
   line-height: 12px;
-  font-weight: 200;
   color: #444;
   font-family: proxima-nova;
   padding-top: 5px;
@@ -479,7 +478,7 @@ table.header td {
 
 .h1, h1 {
     font-size: 22px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 26.4px;
     padding-bottom: 13.5px;
   border-bottom: 1px solid #fff;
@@ -537,13 +536,13 @@ strong {
 .no-borders tr,
 .no-borders td  { border-style: none !important; }
 
-.table { margin: 12px 0; margin-bottom: 20px!important; width: 100%; max-width: 100%; border-spacing: 0px; border-collapse: collapse; }
+.table { margin: 15px 0; margin-bottom: 20px!important; width: 100%; max-width: 100%; border-spacing: 0px; border-collapse: collapse; }
 
 .table > thead > tr > th {
-  vertical-align: bottom;
+  vertical-align: center;
 }
 
-.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th { padding: 5px; }
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th { padding: 10px; }
 
 table {
   page-break-inside: auto;
