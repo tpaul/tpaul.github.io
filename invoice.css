@@ -424,11 +424,11 @@ textarea {
  ****************************************************************************/
 
 body {
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 12px;
   font-weight: 200;
   color: #444;
-  font-family: 'Open Sans';
+  font-family: proxima-nova;
   padding-top: 5px;
   padding-bottom: 10px;
 }
