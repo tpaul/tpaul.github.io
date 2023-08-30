@@ -424,7 +424,7 @@ textarea {
  ****************************************************************************/
 
 body {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 12px;
   font-weight: 200;
   color: #444;
@@ -468,7 +468,7 @@ table.header td {
 .header-contact {
   margin: 0px 0px 0px 1em;
     font-weight: 400;
-    color: #1c8bd0!important;
+    color: #053133!important;
     font-size: 8.5px;
 }
 
@@ -483,7 +483,7 @@ table.header td {
     line-height: 26.4px;
     padding-bottom: 13.5px;
   border-bottom: 1px solid #fff;
-  border-bottom-color: #1c8bd0!important;
+  border-bottom-color: #053133!important;
 }
 
 .h2, h2 {
@@ -515,7 +515,7 @@ table.header td {
   border: 1px solid #fff !important;
   border-left-style: hidden !important;
   border-right-style: hidden !important;
-  border-color: #bfdef0!important; 
+  border-color: #053133!important; 
 }
 
 hr {
@@ -578,7 +578,7 @@ table.quote > thead > tr {
   background-color: #fff !important;
   border-top: 1px solid #bfdef0 !important;
   border-top-style: solid !important;
-  border-top-color: #9fc4db!important; 
+  border-top-color: #053133!important; 
 }
 
 table.quote > thead > tr > th {
@@ -587,15 +587,15 @@ table.quote > thead > tr > th {
 }
 
 table.quote > tbody > tr:first-of-type {
-  border-top: 1px solid #bfdef0 !important;
+  border-top: 1px solid #053133 !important;
   border-top-style: solid !important;
-  border-top-color: #9fc4db!important;
+  border-top-color: #053133!important;
 }
 
 table.quote > tbody > tr:last-of-type {
-  border-bottom: 1px solid #bfdef0 !important;
+  border-bottom: 1px solid #053133 !important;
   border-bottom-style: solid !important;
-  border-bottom-color: #9fc4db!important;
+  border-bottom-color: #053133!important;
 }
 
 table.quote i {
@@ -635,24 +635,24 @@ table.price-table, table.price-table tr, table.price-table td {
 table.price-table tr td:last-of-type { text-align: right; }
 
 table.price-table tr:first-of-type {
-  border-top: 1px solid #278dcd !important;
+  border-top: 1px solid #053133 !important;
   border-top-style: solid !important;
-  border-top-color: #9fc4db!important; 
+  border-top-color: #053133!important; 
 }
 
 table.price-table tr:last-of-type {
-  border-top: 1px solid #bfdef0 !important;
+  border-top: 1px solid #053133 !important;
   border-top-style: solid !important;
-  border-bottom: 1px solid #278dcd !important;
+  border-bottom: 1px solid #053133 !important;
   border-bottom-style: solid !important;
-  border-bottom-color: #9fc4db!important;
+  border-bottom-color: #053133!important;
 }
 
 
 small { font-size: 7px; line-height: 8.4px; }
 
 footer {
-  color: #1c8bd0;
+  color: #053133;
   text-align: center;
     position: relative;
     font-size: 8px;
