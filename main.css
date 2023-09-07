@@ -9,6 +9,10 @@ h1 {
     text-align: center;
 }
 
+logo {
+    margin-bottom: 20px;
+}
+
 thead, th {
     width:  10%;
 }
