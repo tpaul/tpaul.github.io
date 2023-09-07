@@ -54,3 +54,10 @@ ol.lower-roman li {
     margin: 0;
 }
 
+.registry_list ul {
+    font-weight: 300;
+    font-size: 18px;
+    list-style-type: none;
+    line-height: 2;
+}
+
