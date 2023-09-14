@@ -30,11 +30,11 @@ th, td {
 }
 
 .notice {
-    font-family: TimesNewRoman, 'Times New Roman', Times, serif;
+    font-size: 16pt;
+    font-family: proxima-nova;
     border-style: solid;
     padding-left: 10px;
-    padding-right: 10px;
-    text-size: 14px;
+    padding-right: 10px;  
 }
 
  .declarations th {
