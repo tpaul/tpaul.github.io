@@ -34,7 +34,8 @@ th, td {
     font-family: proxima-nova;
     border-style: solid;
     padding-left: 10px;
-    padding-right: 10px;  
+    padding-right: 10px;
+    text-transfom: uppercase;
 }
 
  .declarations th {
