@@ -42,11 +42,7 @@ th, td {
     font-weight: bold;
 }
 
-ol {
-    text-align: justify;
-}
-
-ol li {
+.certificate li {
     margin: 14px 0;
 }
 
