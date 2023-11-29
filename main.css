@@ -1,0 +1,60 @@
+body {
+    margin: 0;
+    line-height: normal;
+    font-family: proxima-nova;
+}
+
+h1 {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 300;
+    padding-bottom: 8px;
+}
+
+logo {
+    margin-bottom: 20px;
+}
+
+thead, th {
+    width:  10%;
+}
+
+th, td {
+    padding: 8px;
+    font-weight: normal;
+    text-align: left;
+}
+
+.header, .signature {
+    text-align: right;
+}
+
+.notice {
+    font-size: 16pt;
+    font-family: proxima-nova;
+    border-style: solid;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-transfom: uppercase;
+}
+
+ .declarations th {
+    font-weight: bold;
+}
+
+.certificate li {
+    margin: 14px 0;
+}
+
+ol.lower-roman li {
+    list-style-type: lower-roman;
+    margin: 0;
+}
+
+.registry_list ul {
+    font-weight: 300;
+    font-size: 18px;
+    list-style-type: none;
+    line-height: 2;
+}
+

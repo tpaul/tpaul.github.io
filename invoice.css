@@ -1,0 +1,172 @@
+ body {
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 200;
+  color: #444;
+  font-family: proxima-nova;
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+body > div,
+body > table {
+  max-width: 605px;
+  width: 100%;
+  margin: auto;
+  position: relative;
+}
+
+table.header {
+  margin-bottom: 20px;
+}
+
+table.header td {
+  height: 0px;
+  width: 50%;
+}
+
+.logo {
+  float:right;
+  width: auto;
+}
+
+.header-contact {
+    color: #053133!important;
+    font-size: 15px;
+}
+
+.h1, h1 {
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 26.4px;
+  padding-bottom: 13.5px;
+border-bottom: 1px solid #fff;
+border-bottom-color:#053133!important;
+}
+
+.h2, h2 {
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 20.4px;
+}
+
+.h3, h3 {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 15.6px;
+}
+
+large-first-column tr > td:first-of-type { width: 25%; }
+
+.no-borders,
+.no-borders tr,
+.no-borders td  { border-style: none !important; }
+
+.table { margin: 12px 0; margin-bottom: 20px!important; width: 100%; max-width: 100%; border-spacing: 0px; border-collapse: collapse; }
+
+.table > thead > tr > th {
+  vertical-align: bottom;
+}
+
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th { padding: 5px; }
+
+table {
+  page-break-inside: auto;
+}
+
+table.content > tbody > tr > td:first-of-type {
+  font-weight: bold;
+}
+
+table.content > tbody > tr > td:first-of-type {
+  width: 25%;
+  vertical-align: top;
+}
+
+table.quote > tbody tr:nth-child(even) { background-color: #fff!important; }
+table.quote > tbody tr:nth-child(odd) { background-color: #f4f4f4!important; }
+table.quote tr td { text-align: center; }
+table.quote tr td:first-of-type { text-align: left; }
+
+table.quote > tbody > tr > td, table.quote > tbody > tr > th, table.quote > tfoot > tr > td, table.quote > tfoot > tr > th, table.quote > thead > tr > td, table.quote > thead > tr > th { padding: 5px 10px; }
+
+table.quote {
+  table-layout: fixed;
+}
+
+table.quote, table.quote tr, table.quote td {
+  border-style: none!important;
+}
+
+table.quote > thead > tr {
+  background-color: #fff !important;
+  border-top: 1px solid #bfdef0 !important;
+  border-top-style: solid !important;
+  border-top-color: #9fc4db!important; 
+}
+
+table.quote > thead > tr > th {
+  text-align: center;
+  font-weight: bold;
+}
+
+table.quote > tbody > tr:first-of-type {
+  border-top: 1px solid #bfdef0 !important;
+  border-top-style: solid !important;
+  border-top-color: #9fc4db!important;
+}
+
+table.quote > tbody > tr:last-of-type {
+  border-bottom: 1px solid #bfdef0 !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: #9fc4db!important;
+}
+
+table.quote i {
+    display: inline-block;
+    height: 6px;
+    width: 6px;
+    margin-top: 3px;
+    background-color: #053133!important;
+    border: 0;
+    border-radius: 50%;
+    -webkit-print-color-adjust: exact!important;
+}
+
+table.quote > tbody > tr.section-break { 
+    border-top: 1px solid #bfdef0 !important;
+}
+
+table.price-table > tbody tr:nth-child(even) { background-color: #fff; }
+table.price-table > tbody tr:nth-child(odd) { background-color: #f4f4f4!important; }
+table.price-table tr td { text-align: center; }
+table.price-table tr td:first-of-type { text-align: left; }
+
+table.price-table > tbody > tr > td, table.price-table > tbody > tr > th, table.price-table > tfoot > tr > td, table.price-table > tfoot > tr > th, table.price-table > thead > tr > td, table.price-table > thead > tr > th { padding: 5px 10px; }
+
+table.price-table {
+  max-width: 250px;
+  width: 50%;
+  margin: 35px auto;
+  margin-bottom: 35px!important;
+}
+
+table.price-table, table.price-table tr, table.price-table td {
+  border-style: none!important;
+}
+
+table.price-table tr td:last-of-type { text-align: right; }
+
+table.price-table tr:first-of-type {
+  border-top: 1px solid #053133!important;
+  border-top-style: solid !important;
+  border-top-color: ##053133!important; 
+}
+
+table.price-table tr:last-of-type {
+  border-top: 1px solid #bfdef0 !important;
+  border-top-style: solid !important;
+  border-bottom: 1px solid #053133!important;
+  border-bottom-style: solid !important;
+  border-bottom-color: ##053133!important;
+}
