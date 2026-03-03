@@ -464,6 +464,35 @@
       color: var(--text-muted);
       margin-top: 0.25rem;
     }
+    /* ── FILE CONNECT ── */
+    .file-connect {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .file-connect-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .file-connect-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .file-connect-btn.connected { border-color: var(--green-border); color: var(--green); }
+
+    .file-connect-status {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 520px) {
       body { font-size: 15px; padding-bottom: 4rem; }
@@ -574,6 +603,10 @@
       <span><strong>Paris Marathon</strong> 🇫🇷 · April 12, 2026</span>
       <span id="countdown"></span>
     </div>
+    <div class="file-connect">
+      <button class="file-connect-btn" id="file-connect-btn" onclick="connectFile()">Connect file</button>
+      <span class="file-connect-status" id="file-connect-status">not connected · saves to browser only</span>
+    </div>
   </div>
 
   <div class="progress-wrap">
@@ -597,6 +630,109 @@
 
   <script>
     const STORAGE_KEY = 'marathon-tracker-2026';
+
+    // ── FILE SYSTEM ACCESS API ──
+    const DB_NAME  = 'marathon-tracker-db';
+    const DB_STORE = 'file-handles';
+    let fileHandle = null;
+
+    function getDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore(DB_STORE);
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = reject;
+      });
+    }
+
+    async function persistHandle(handle) {
+      const db = await getDB();
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(handle, 'runs-file');
+    }
+
+    async function retrieveHandle() {
+      const db = await getDB();
+      return new Promise(resolve => {
+        const tx  = db.transaction(DB_STORE, 'readonly');
+        const req = tx.objectStore(DB_STORE).get('runs-file');
+        req.onsuccess = e => resolve(e.target.result || null);
+        req.onerror   = () => resolve(null);
+      });
+    }
+
+    async function verifyPermission(handle) {
+      const opts = { mode: 'readwrite' };
+      if ((await handle.queryPermission(opts)) === 'granted')   return true;
+      if ((await handle.requestPermission(opts)) === 'granted') return true;
+      return false;
+    }
+
+    function updateConnectUI() {
+      const btn    = document.getElementById('file-connect-btn');
+      const status = document.getElementById('file-connect-status');
+      if (fileHandle) {
+        btn.textContent = 'Connected ✓';
+        btn.classList.add('connected');
+        btn.onclick = null;
+        status.textContent = fileHandle.name;
+      } else {
+        btn.textContent = 'Connect file';
+        btn.classList.remove('connected');
+        btn.onclick = connectFile;
+        status.textContent = 'not connected · saves to browser only';
+      }
+    }
+
+    async function connectFile() {
+      if (!window.showOpenFilePicker) {
+        alert('File System Access API not supported in this browser. Use Chrome or Edge.');
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+          excludeAcceptAllOption: true,
+        });
+        fileHandle = handle;
+        await persistHandle(handle);
+        updateConnectUI();
+        // Sync: write current localStorage data into the file so it's seeded
+        await writeToFile(load());
+      } catch (e) { /* user cancelled */ }
+    }
+
+    async function writeToFile(data) {
+      if (!fileHandle) return;
+      try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(JSON.stringify(data, null, 2));
+        await writable.close();
+      } catch (e) { console.warn('File write failed:', e); }
+    }
+
+    async function readFromFile() {
+      if (!fileHandle) return null;
+      try {
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        return JSON.parse(text);
+      } catch (e) { return null; }
+    }
+
+    async function initFileHandle() {
+      const stored = await retrieveHandle();
+      if (!stored) return;
+      const ok = await verifyPermission(stored);
+      if (!ok) return;
+      fileHandle = stored;
+      updateConnectUI();
+      // Prefer file data over localStorage (file is source of truth)
+      const fileData = await readFromFile();
+      if (fileData) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fileData));
+      }
+    }
 
     // Each workout has an id (used as storage key), label, and type
     const weeks = [
@@ -803,6 +939,7 @@
 
     function save(data) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      writeToFile(data); // async, fire and forget
     }
 
     function getMiles(w) { return parseInt(w.label); }
@@ -1094,6 +1231,11 @@
 
     prepopulatePastWeeks();
     updateCountdown();
+    // Init file handle (async) — re-renders once file data is loaded
+    initFileHandle().then(() => {
+      prepopulatePastWeeks();
+      render();
+    });
     render();
   </script>
 
