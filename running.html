@@ -464,12 +464,54 @@
       color: var(--text-muted);
       margin-top: 0.25rem;
     }
+    /* ── PAGE LABEL ROW ── */
+    .page-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-label-row .page-label { margin-bottom: 0; }
+
+    .header-menu { position: relative; }
+
+    .header-menu-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0 0.2rem;
+      line-height: 1;
+      letter-spacing: 0.15em;
+      transition: color 0.15s;
+      font-family: var(--font-sans);
+    }
+
+    .header-menu-btn:hover { color: var(--text); }
+
+    .header-menu-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 0.4rem);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      min-width: 260px;
+    }
+
+    .header-menu-dropdown.open { display: block; }
+
     /* ── FILE CONNECT ── */
     .file-connect {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-top: 0.75rem;
     }
 
     .file-connect-btn {
@@ -596,16 +638,23 @@
 <body>
 
   <div class="page-header">
-    <p class="page-label">Hal Higdon Novice 1</p>
+    <div class="page-label-row">
+      <p class="page-label">Hal Higdon Novice 1</p>
+      <div class="header-menu">
+        <button class="header-menu-btn" id="header-menu-btn" aria-label="Options" aria-expanded="false">···</button>
+        <div class="header-menu-dropdown" id="header-menu-dropdown">
+          <div class="file-connect">
+            <button class="file-connect-btn" id="file-connect-btn" onclick="connectFile()">Connect file</button>
+            <span class="file-connect-status" id="file-connect-status">not connected · saves to browser only</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <h1 class="page-title">Marathon Training</h1>
     <div class="page-meta">
       <span>Weeks 1–18</span>
       <span><strong>Paris Marathon</strong> 🇫🇷 · April 12, 2026</span>
       <span id="countdown"></span>
-    </div>
-    <div class="file-connect">
-      <button class="file-connect-btn" id="file-connect-btn" onclick="connectFile()">Connect file</button>
-      <span class="file-connect-status" id="file-connect-status">not connected · saves to browser only</span>
     </div>
   </div>
 
@@ -1237,6 +1286,23 @@
       render();
     });
     render();
+
+    // ── HEADER MENU ──
+    const headerMenuBtn = document.getElementById('header-menu-btn');
+    const headerMenuDropdown = document.getElementById('header-menu-dropdown');
+
+    headerMenuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = headerMenuDropdown.classList.toggle('open');
+      headerMenuBtn.setAttribute('aria-expanded', String(open));
+    });
+
+    document.addEventListener('click', () => {
+      headerMenuDropdown.classList.remove('open');
+      headerMenuBtn.setAttribute('aria-expanded', 'false');
+    });
+
+    headerMenuDropdown.addEventListener('click', e => e.stopPropagation());
   </script>
 
 </body>
