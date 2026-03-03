@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marathon Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏁</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FEFCF8;
+      --surface: #F7F2EC;
+      --surface2: #EDE6DC;
+      --border: #E2D9CE;
+      --accent: #C4506A;
+      --accent-light: #FAF0F3;
+      --accent-border: #EAC8D0;
+      --text: #1C1614;
+      --text-muted: #7A6E6A;
+      --green: #3A9E6F;
+      --green-light: #EDF7F2;
+      --green-border: #B8DFD0;
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+      --font-serif: 'DM Serif Display', Georgia, serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 6rem;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-label {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-meta {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .page-meta span { font-family: var(--font-mono); font-size: 0.8rem; }
+    .page-meta strong { color: var(--text); }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      max-width: 680px;
+      margin: 1.75rem auto 0;
+      padding: 0 1.5rem;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-bar-bg {
+      background: var(--surface2);
+      border-radius: 99px;
+      height: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: var(--accent);
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── WEEKS ── */
+    .weeks {
+      max-width: 680px;
+      margin: 2.5rem auto 0;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ── WEEK CARD ── */
+    .week-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .week-card:not(.is-collapsed) {
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .week-card.is-current {
+      border-color: var(--accent);
+    }
+
+    .week-card.is-complete {
+      border-color: var(--green-border);
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+
+    .week-card.is-complete .week-header {
+      border-bottom-color: var(--green-border);
+      background: var(--green-light);
+    }
+
+    .week-card.is-current .week-header {
+      background: var(--accent-light);
+      border-bottom-color: var(--accent-border);
+    }
+
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .week-card:not(.is-collapsed) .workout-row {
+      animation: rowIn 0.2s ease both;
+    }
+
+    .week-card:not(.is-collapsed) .workouts > div:nth-child(1) .workout-row { animation-delay: 0.05s; }
+    .week-card:not(.is-collapsed) .workouts > div:nth-child(2) .workout-row { animation-delay: 0.10s; }
+    .week-card:not(.is-collapsed) .workouts > div:nth-child(3) .workout-row { animation-delay: 0.15s; }
+    .week-card:not(.is-collapsed) .workouts > div:nth-child(4) .workout-row { animation-delay: 0.20s; }
+
+    .week-header.is-past {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .week-header.is-past:hover {
+      background: var(--surface);
+    }
+
+    .week-chevron {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      margin-left: 0.5rem;
+    }
+
+    .week-card.is-collapsed .week-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .workouts {
+      overflow: hidden;
+      max-height: 600px;
+      opacity: 1;
+      transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.35s ease;
+    }
+
+    .week-card.is-collapsed .workouts {
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .week-card.is-collapsed .week-header {
+      border-bottom: none;
+    }
+
+    .week-info { display: flex; flex-direction: column; gap: 0.1rem; }
+
+    .week-label {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .week-card.is-current .week-label { color: var(--accent); }
+    .week-card.is-complete .week-label { color: var(--green); }
+
+    .week-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .week-dates {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .week-summary {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .week-summary strong { color: var(--text); font-size: 0.9rem; }
+
+    /* ── WORKOUTS ── */
+    .workouts {
+      padding: 0.75rem 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .workout-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* checkbox */
+    .workout-check {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .workout-check:checked {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .workout-check:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 0px;
+      width: 6px; height: 10px;
+      border: 2px solid white;
+      border-top: none; border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .workout-label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .workout-label.is-done {
+      color: var(--green);
+      text-decoration: line-through;
+      text-decoration-color: var(--green-border);
+    }
+
+    .workout-label.is-cross {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .note-toggle {
+      background: none;
+      border: none;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+
+    .note-toggle:hover, .note-toggle.has-note { color: var(--accent); }
+
+    .note-preview {
+      margin: 0 0 0.5rem 1.75rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .note-preview::before { content: '"'; }
+    .note-preview::after  { content: '"'; }
+
+    .note-area {
+      display: none;
+      padding: 0 0 0.25rem 1.75rem;
+    }
+
+    .note-area.open { display: block; }
+
+    .note-area-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      padding-right: 0.25rem;
+    }
+
+    .note-save {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .note-save:hover { opacity: 0.85; }
+
+    .note-delete {
+      background: none;
+      border: none;
+      padding: 0.35rem 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+
+    .note-delete:hover { color: var(--accent); }
+
+    .note-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      color: var(--text);
+      resize: vertical;
+      min-height: 56px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .note-input:focus { border-color: var(--accent); }
+    .note-input::placeholder { color: var(--text-muted); }
+
+    /* ── PAST GROUP ── */
+    .past-group {
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .past-group-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: left;
+      transition: background 0.15s;
+    }
+
+    .past-group-toggle:hover { background: var(--surface2); }
+
+    .past-group-meta {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .past-group-body {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg);
+    }
+
+    /* ── MARATHON DAY ── */
+    .marathon-card {
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      background: var(--accent-light);
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+    }
+
+    .marathon-card .week-label {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .marathon-card h2 {
+      font-family: var(--font-serif);
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .marathon-card p {
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    /* ── MOBILE ── */
+    @media (max-width: 520px) {
+      body { font-size: 15px; padding-bottom: 4rem; }
+
+      .page-header {
+        padding: 2rem 1rem 1.25rem;
+      }
+
+      .page-meta {
+        gap: 0.75rem;
+      }
+
+      .progress-wrap {
+        padding: 0 1rem;
+        margin-top: 1.25rem;
+      }
+
+      .weeks {
+        padding: 0 1rem;
+        margin-top: 1.5rem;
+        gap: 0.75rem;
+      }
+
+      .week-header {
+        padding: 0.85rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .week-name { font-size: 0.9rem; }
+
+      .week-summary {
+        font-size: 0.7rem;
+        white-space: nowrap;
+      }
+
+      .week-summary strong { font-size: 0.85rem; }
+
+      .workouts {
+        padding: 0.5rem 1rem 0.75rem;
+        gap: 0.6rem;
+      }
+
+      .workout-row {
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .workout-check {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+
+      .workout-check:checked::after {
+        left: 4px;
+        top: 1px;
+        width: 7px;
+        height: 11px;
+      }
+
+      .workout-label {
+        font-size: 0.9rem;
+        flex: 1;
+      }
+
+      .note-toggle {
+        font-size: 0.7rem;
+        padding: 0.2rem 0;
+      }
+
+      .note-area {
+        padding: 0 0 0.25rem 0;
+      }
+
+      .note-preview {
+        margin-left: 0;
+        font-size: 0.8rem;
+      }
+
+      .note-input {
+        font-size: 0.85rem;
+      }
+
+      .past-group-toggle {
+        padding: 0.85rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      .past-group-body {
+        padding: 0.5rem;
+      }
+
+      .marathon-card {
+        padding: 1.25rem 1rem;
+      }
+
+      .marathon-card h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <p class="page-label">Hal Higdon Novice 1</p>
+    <h1 class="page-title">Marathon Training</h1>
+    <div class="page-meta">
+      <span>Weeks 1–18</span>
+      <span><strong>Paris Marathon</strong> 🇫🇷 · April 12, 2026</span>
+      <span id="countdown"></span>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">0 of 0 workouts done</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-meta" style="margin-top: 0.9rem;">
+      <span id="miles-label">0 of 0 miles</span>
+      <span id="miles-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="miles-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="weeks" id="tracker"></div>
+
+  <script>
+    const STORAGE_KEY = 'marathon-tracker-2026';
+
+    // Each workout has an id (used as storage key), label, and type
+    const weeks = [
+      {
+        id: 'w1', label: 'Week 1', dates: 'Nov 24–30',
+        workouts: [
+          { id: 'w1-a', label: '3 miles', type: 'run' },
+          { id: 'w1-b', label: '3 miles', type: 'run' },
+          { id: 'w1-c', label: '3 miles', type: 'run' },
+          { id: 'w1-d', label: '6 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w2', label: 'Week 2', dates: 'Dec 1–7',
+        workouts: [
+          { id: 'w2-a', label: '3 miles', type: 'run' },
+          { id: 'w2-b', label: '3 miles', type: 'run' },
+          { id: 'w2-c', label: '3 miles', type: 'run' },
+          { id: 'w2-d', label: '7 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w3', label: 'Week 3', dates: 'Dec 8–14',
+        workouts: [
+          { id: 'w3-a', label: '3 miles', type: 'run' },
+          { id: 'w3-b', label: '4 miles', type: 'run' },
+          { id: 'w3-c', label: '3 miles', type: 'run' },
+          { id: 'w3-d', label: '5 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w4', label: 'Week 4', dates: 'Dec 15–21',
+        workouts: [
+          { id: 'w4-a', label: '3 miles', type: 'run' },
+          { id: 'w4-b', label: '4 miles', type: 'run' },
+          { id: 'w4-c', label: '3 miles', type: 'run' },
+          { id: 'w4-d', label: '9 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w5', label: 'Week 5', dates: 'Jan 5–11',
+        workouts: [
+          { id: 'w5-a', label: '3 miles',  type: 'run' },
+          { id: 'w5-b', label: '5 miles',  type: 'run' },
+          { id: 'w5-c', label: '3 miles',  type: 'run' },
+          { id: 'w5-d', label: '10 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w6', label: 'Week 6', dates: 'Jan 12–18',
+        workouts: [
+          { id: 'w6-a', label: '3 miles', type: 'run' },
+          { id: 'w6-b', label: '5 miles', type: 'run' },
+          { id: 'w6-c', label: '3 miles', type: 'run' },
+          { id: 'w6-d', label: '7 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w7', label: 'Week 7', dates: 'Jan 19–25',
+        workouts: [
+          { id: 'w7-a', label: '3 miles',  type: 'run' },
+          { id: 'w7-b', label: '6 miles',  type: 'run' },
+          { id: 'w7-c', label: '3 miles',  type: 'run' },
+          { id: 'w7-d', label: '12 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w8', label: 'Week 8', dates: 'Jan 26 – Feb 1',
+        workouts: [
+          { id: 'w8-a', label: '3 miles',       type: 'run' },
+          { id: 'w8-b', label: '6 miles',       type: 'run' },
+          { id: 'w8-c', label: '3 miles',       type: 'run' },
+          { id: 'w8-d', label: '13 mi (Half Marathon)', type: 'run' },
+        ]
+      },
+      {
+        id: 'w9', label: 'Week 9', dates: 'Feb 2–8',
+        workouts: [
+          { id: 'w9-a', label: '3 miles',  type: 'run' },
+          { id: 'w9-b', label: '7 miles',  type: 'run' },
+          { id: 'w9-c', label: '4 miles',  type: 'run' },
+          { id: 'w9-d', label: '10 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w10', label: 'Week 10', dates: 'Feb 9–15',
+        workouts: [
+          { id: 'w10-a', label: '3 miles',  type: 'run' },
+          { id: 'w10-b', label: '7 miles',  type: 'run' },
+          { id: 'w10-c', label: '4 miles',  type: 'run' },
+          { id: 'w10-d', label: '15 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w11', label: 'Week 11', dates: 'Feb 16–22',
+        workouts: [
+          { id: 'w11-a', label: '4 miles',  type: 'run' },
+          { id: 'w11-b', label: '8 miles',  type: 'run' },
+          { id: 'w11-c', label: '4 miles',  type: 'run' },
+          { id: 'w11-d', label: '16 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w12', label: 'Week 12', dates: 'Feb 23 – Mar 1',
+        workouts: [
+          { id: 'w12-a', label: '4 miles',  type: 'run' },
+          { id: 'w12-b', label: '8 miles',  type: 'run' },
+          { id: 'w12-c', label: '5 miles',  type: 'run' },
+          { id: 'w12-d', label: '12 miles', type: 'run' },
+        ]
+      },
+      {
+        id: 'w13', label: 'Week 13', dates: 'Mar 2–8',
+        workouts: [
+          { id: 'w13-a', label: '4 miles',  type: 'run'   },
+          { id: 'w13-b', label: '9 miles',  type: 'run'   },
+          { id: 'w13-c', label: '5 miles',  type: 'run'   },
+          { id: 'w13-d', label: '18 miles', type: 'run'   },
+        ]
+      },
+      {
+        id: 'w14', label: 'Week 14', dates: 'Mar 9–15',
+        workouts: [
+          { id: 'w14-a', label: '5 miles',  type: 'run'   },
+          { id: 'w14-b', label: '9 miles',  type: 'run'   },
+          { id: 'w14-c', label: '5 miles',  type: 'run'   },
+          { id: 'w14-d', label: '14 miles', type: 'run'   },
+        ]
+      },
+      {
+        id: 'w15', label: 'Week 15', dates: 'Mar 16–22',
+        workouts: [
+          { id: 'w15-a', label: '5 miles',  type: 'run'   },
+          { id: 'w15-b', label: '10 miles', type: 'run'   },
+          { id: 'w15-c', label: '5 miles',  type: 'run'   },
+          { id: 'w15-d', label: '20 miles', type: 'run'   },
+        ]
+      },
+      {
+        id: 'w16', label: 'Week 16 · Taper begins', dates: 'Mar 23–29',
+        workouts: [
+          { id: 'w16-a', label: '5 miles',  type: 'run'   },
+          { id: 'w16-b', label: '8 miles',  type: 'run'   },
+          { id: 'w16-c', label: '4 miles',  type: 'run'   },
+          { id: 'w16-d', label: '12 miles', type: 'run'   },
+        ]
+      },
+      {
+        id: 'w17', label: 'Week 17', dates: 'Mar 30 – Apr 5',
+        workouts: [
+          { id: 'w17-a', label: '4 miles', type: 'run'   },
+          { id: 'w17-b', label: '6 miles', type: 'run'   },
+          { id: 'w17-c', label: '3 miles', type: 'run'   },
+          { id: 'w17-d', label: '8 miles', type: 'run'   },
+        ]
+      },
+      {
+        id: 'w18', label: 'Week 18 · Race week', dates: 'Apr 6–11',
+        workouts: [
+          { id: 'w18-a', label: '3 miles', type: 'run' },
+          { id: 'w18-b', label: '4 miles', type: 'run' },
+          { id: 'w18-c', label: '2 miles', type: 'run' },
+        ]
+      },
+    ];
+
+    // Determine current week based on today's date
+    const weekStartDates = {
+      w1:  '2025-11-24',
+      w2:  '2025-12-01',
+      w3:  '2025-12-08',
+      w4:  '2025-12-15',
+      w5:  '2026-01-05',
+      w6:  '2026-01-12',
+      w7:  '2026-01-19',
+      w8:  '2026-01-26',
+      w9:  '2026-02-02',
+      w10: '2026-02-09',
+      w11: '2026-02-16',
+      w12: '2026-02-23',
+      w13: '2026-03-02',
+      w14: '2026-03-09',
+      w15: '2026-03-16',
+      w16: '2026-03-23',
+      w17: '2026-03-30',
+      w18: '2026-04-06',
+    };
+
+    function getCurrentWeek() {
+      const today = new Date(); today.setHours(0,0,0,0);
+      let current = null;
+      for (const [id, start] of Object.entries(weekStartDates)) {
+        if (today >= new Date(start)) current = id;
+      }
+      return current;
+    }
+
+    const CURRENT_WEEK = getCurrentWeek();
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function save(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getMiles(w) { return parseInt(w.label); }
+
+    function updateProgress(data) {
+      const all = weeks.flatMap(w => w.workouts);
+
+      const done = all.filter(w => data[w.id]?.done).length;
+      const pct = Math.round((done / all.length) * 100);
+      document.getElementById('progress-label').textContent = `${done} of ${all.length} workouts done`;
+      document.getElementById('progress-pct').textContent = `${pct}%`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+
+      const totalMiles = all.reduce((sum, w) => sum + getMiles(w), 0);
+      const doneMiles = all.filter(w => data[w.id]?.done).reduce((sum, w) => sum + getMiles(w), 0);
+      const milesPct = Math.round((doneMiles / totalMiles) * 100);
+      document.getElementById('miles-label').textContent = `${doneMiles} of ${totalMiles} miles`;
+      document.getElementById('miles-pct').textContent = `${milesPct}%`;
+      document.getElementById('miles-bar').style.width = `${milesPct}%`;
+    }
+
+    function updateCountdown() {
+      const marathon = new Date('2026-04-12');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diff = Math.ceil((marathon - today) / 86400000);
+      const el = document.getElementById('countdown');
+      if (diff > 0) el.innerHTML = `<strong>${diff}</strong> days to go`;
+      else if (diff === 0) el.innerHTML = `<strong>Race day!</strong> 🏁`;
+      else el.innerHTML = `You did it! 🎉`;
+    }
+
+    function buildWeekCard(week, data, isCurrent, isPast, isFuture) {
+      const allDone = week.workouts.every(w => data[w.id]?.done);
+      const isCollapsible = isPast || isFuture;
+      const card = document.createElement('div');
+      card.className = `week-card${isCurrent ? ' is-current' : ''}${allDone ? ' is-complete' : ''}${isPast ? ' is-past' : ''}${isCollapsible ? ' is-collapsed' : ''}`;
+
+      const weekLabel = isCurrent ? 'Current week' : allDone ? 'Complete ✓' : '';
+      const runMiles = week.workouts.filter(w => w.type === 'run').reduce((sum, w) => sum + parseInt(w.label), 0);
+      const chevron = isCollapsible ? `<span class="week-chevron">▾</span>` : '';
+
+      card.innerHTML = `
+        <div class="week-header${isCollapsible ? ' is-past' : ''}">
+          <div class="week-info">
+            ${weekLabel ? `<span class="week-label">${weekLabel}</span>` : ''}
+            <span class="week-name">${week.label} ${chevron}</span>
+            <span class="week-dates">${week.dates}</span>
+          </div>
+          <div class="week-summary">
+            <strong>${runMiles} mi</strong><br>this week
+          </div>
+        </div>
+        <div class="workouts" id="workouts-${week.id}"></div>
+      `;
+
+      if (isCollapsible) {
+        if (!expandedByUser.has(week.id)) card.classList.add('is-collapsed');
+        else card.classList.remove('is-collapsed');
+
+        const chevronEl = card.querySelector('.week-chevron');
+        const updateChevron = () => {
+          if (chevronEl) chevronEl.textContent = card.classList.contains('is-collapsed') ? '▸' : '▾';
+        };
+        updateChevron();
+
+        card.querySelector('.week-header').addEventListener('click', () => {
+          if (expandedByUser.has(week.id)) expandedByUser.delete(week.id);
+          else expandedByUser.add(week.id);
+          card.classList.toggle('is-collapsed');
+          updateChevron();
+        });
+      }
+
+      const workoutsEl = card.querySelector(`#workouts-${week.id}`);
+      week.workouts.forEach(workout => {
+        const entry = data[workout.id] || {};
+        const isDone = !!entry.done;
+        const hasNote = !!(entry.note && entry.note.trim());
+        const row = document.createElement('div');
+        row.innerHTML = `
+          <div class="workout-row">
+            <input type="checkbox" class="workout-check" data-id="${workout.id}" ${isDone ? 'checked' : ''} />
+            <span class="workout-label ${isDone ? 'is-done' : ''}">${workout.label}</span>
+            <button class="note-toggle ${hasNote ? 'has-note' : ''}" data-id="${workout.id}">${hasNote ? '✎ note' : '+ note'}</button>
+          </div>
+          ${hasNote ? `<p class="note-preview" data-id="${workout.id}">${entry.note}</p>` : ''}
+          <div class="note-area ${hasNote ? 'open' : ''}" data-id="${workout.id}">
+            <textarea class="note-input" data-id="${workout.id}" placeholder="How did it feel?">${entry.note || ''}</textarea>
+            <div class="note-area-footer">
+              <button class="note-delete" data-id="${workout.id}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+              <button class="note-save" data-id="${workout.id}">Save</button>
+            </div>
+          </div>
+        `;
+        workoutsEl.appendChild(row);
+      });
+
+      return card;
+    }
+
+    // Tracks which collapsible week IDs the user has manually opened
+    // Current week starts expanded by default
+    const expandedByUser = new Set([CURRENT_WEEK]);
+
+    function render() {
+      const data = load();
+      const tracker = document.getElementById('tracker');
+      const pastGroupOpen = document.querySelector('.past-group-body')?.style.display === 'flex';
+      tracker.innerHTML = '';
+
+      const currentIndex = weeks.findIndex(w => w.id === CURRENT_WEEK);
+      const pastWeeks    = weeks.slice(0, currentIndex);
+      const currentWeek  = weeks[currentIndex];
+      const futureWeeks  = weeks.slice(currentIndex + 1);
+
+      // 1. Past weeks — collapsible group
+      if (pastWeeks.length > 0) {
+        const completedMiles = pastWeeks
+          .flatMap(w => w.workouts)
+          .filter(w => w.type === 'run')
+          .reduce((sum, w) => sum + parseInt(w.label), 0);
+
+        const group = document.createElement('div');
+        group.className = 'past-group';
+        group.innerHTML = `
+          <button class="past-group-toggle" aria-expanded="false">
+            <span>Past weeks (1–${pastWeeks.length})</span>
+            <span class="past-group-meta">${completedMiles} mi completed <span class="week-chevron">▸</span></span>
+          </button>
+          <div class="past-group-body"></div>
+        `;
+
+        const body = group.querySelector('.past-group-body');
+        const toggle = group.querySelector('.past-group-toggle');
+        const chevron = group.querySelector('.week-chevron');
+
+        // start collapsed
+        body.style.display = 'none';
+
+        toggle.addEventListener('click', () => {
+          const open = body.style.display !== 'none';
+          body.style.display = open ? 'none' : 'flex';
+          chevron.textContent = open ? '▸' : '▾';
+          toggle.setAttribute('aria-expanded', String(!open));
+        });
+
+        // add past week cards inside (each still individually collapsible)
+        pastWeeks.forEach(week => {
+          body.appendChild(buildWeekCard(week, data, false, true, false));
+        });
+
+        // restore past group open state
+        if (pastGroupOpen) {
+          body.style.display = 'flex';
+          chevron.style.transform = 'rotate(0deg)';
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        tracker.appendChild(group);
+      }
+
+      // 2. Current week
+      if (currentWeek) {
+        tracker.appendChild(buildWeekCard(currentWeek, data, true, false, true));
+      }
+
+      // 3. Future weeks
+      futureWeeks.forEach(week => {
+        tracker.appendChild(buildWeekCard(week, data, false, false, true));
+      });
+
+      // 4. Marathon card
+      const marathonCard = document.createElement('div');
+      marathonCard.className = 'marathon-card';
+      marathonCard.innerHTML = `
+        <p class="week-label">April 12, 2026</p>
+        <h2>🏁 Marathon 🇫🇷</h2>
+        <p>Paris Marathon · You've got this.</p>
+      `;
+      tracker.appendChild(marathonCard);
+
+      // events
+      document.querySelectorAll('.workout-check').forEach(cb => {
+        cb.addEventListener('change', e => {
+          const id = e.target.dataset.id;
+          const checked = e.target.checked;
+
+          // save
+          const d = load();
+          d[id] = d[id] || {};
+          d[id].done = checked;
+          save(d);
+
+          // update label style in place
+          const label = e.target.closest('.workout-row')?.querySelector('.workout-label');
+          if (label) label.classList.toggle('is-done', checked);
+
+          // update week card complete state in place
+          const card = e.target.closest('.week-card');
+          if (card) {
+            const allChecked = [...card.querySelectorAll('.workout-check')].every(c => c.checked);
+            card.classList.toggle('is-complete', allChecked);
+          }
+
+          // refresh progress bars
+          updateProgress(load());
+        });
+      });
+
+      document.querySelectorAll('.note-toggle').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.dataset.id;
+          const area = document.querySelector(`.note-area[data-id="${id}"]`);
+          area.classList.toggle('open');
+          if (area.classList.contains('open')) area.querySelector('textarea').focus();
+        });
+      });
+
+      document.querySelectorAll('.note-save').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.dataset.id;
+          const ta = document.querySelector(`.note-input[data-id="${id}"]`);
+          const area = document.querySelector(`.note-area[data-id="${id}"]`);
+          const toggle = document.querySelector(`.note-toggle[data-id="${id}"]`);
+          const d = load();
+          d[id] = d[id] || {};
+          d[id].note = ta.value;
+          save(d);
+          const hasNote = ta.value.trim().length > 0;
+          if (toggle) {
+            toggle.classList.toggle('has-note', hasNote);
+            toggle.textContent = hasNote ? '✎ note' : '+ note';
+          }
+          // update preview element in place
+          let preview = document.querySelector(`.note-preview[data-id="${id}"]`);
+          if (hasNote) {
+            if (!preview) {
+              preview = document.createElement('p');
+              preview.className = 'note-preview';
+              preview.dataset.id = id;
+              area.parentNode.insertBefore(preview, area);
+            }
+            preview.textContent = ta.value;
+          } else if (preview) {
+            preview.remove();
+          }
+          area.classList.remove('open');
+        });
+      });
+
+      document.querySelectorAll('.note-delete').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.dataset.id;
+          const ta = document.querySelector(`.note-input[data-id="${id}"]`);
+          const area = document.querySelector(`.note-area[data-id="${id}"]`);
+          const toggle = document.querySelector(`.note-toggle[data-id="${id}"]`);
+          ta.value = '';
+          const d = load();
+          d[id] = d[id] || {};
+          d[id].note = '';
+          save(d);
+          if (toggle) { toggle.classList.remove('has-note'); toggle.textContent = '+ note'; }
+          const preview = document.querySelector(`.note-preview[data-id="${id}"]`);
+          if (preview) preview.remove();
+          area.classList.remove('open');
+        });
+      });
+
+      updateProgress(data);
+    }
+
+    // Pre-mark all past weeks' workouts as done (only sets if not already stored)
+    function prepopulatePastWeeks() {
+      const d = load();
+      const currentIndex = weeks.findIndex(w => w.id === CURRENT_WEEK);
+      let changed = false;
+      weeks.forEach((week, i) => {
+        if (i < currentIndex) {
+          week.workouts.forEach(workout => {
+            if (!d[workout.id]) {
+              d[workout.id] = { done: true };
+              changed = true;
+            }
+          });
+        }
+      });
+      if (changed) save(d);
+    }
+
+    prepopulatePastWeeks();
+    updateCountdown();
+    render();
+  </script>
+
+</body>
+</html>
