@@ -1,0 +1,11 @@
+{
+  "name": "running-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "running-mcp": "./server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

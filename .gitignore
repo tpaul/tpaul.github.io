@@ -54,3 +54,7 @@ build-iPhoneSimulator/
 
 # Used by RuboCop. Remote config files pulled in from inherit_from directive.
 # .rubocop-https?--*
+
+# Marathon tracker run data (local only)
+runs.json
+running-mcp/node_modules/
